@@ -1,0 +1,32 @@
+{
+  "champion": "xgboost",
+  "cv_accuracy": 0.7335518648018649,
+  "feature_columns": [
+    "age_years",
+    "height",
+    "weight",
+    "bmi",
+    "gender",
+    "ap_hi",
+    "ap_lo",
+    "cholesterol",
+    "gluc",
+    "smoke",
+    "alco",
+    "active"
+  ],
+  "continuous_columns": [
+    "age_years",
+    "height",
+    "weight",
+    "bmi",
+    "ap_hi",
+    "ap_lo"
+  ],
+  "accuracy_threshold": 0.85,
+  "cv_folds": 10,
+  "all_cv_scores": {
+    "xgboost": 0.7335518648018649,
+    "random_forest": 0.7321969696969697
+  }
+}
