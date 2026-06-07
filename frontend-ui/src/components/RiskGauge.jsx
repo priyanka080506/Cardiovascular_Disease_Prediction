@@ -1,54 +1,64 @@
+import { motion } from "framer-motion";
+import AnimatedCounter from "./ui/AnimatedCounter";
 import { riskColor } from "../utils/chartFormatters";
 
-export default function RiskGauge({ percent, label, bmi, modelName }) {
+export default function RiskGauge({ percent, label, compact = false }) {
   const color = riskColor(label);
-  const circumference = 2 * Math.PI * 54;
-  const offset = circumference - (percent / 100) * circumference;
+  const size = compact ? 160 : 208;
+  const radius = compact ? 58 : 70;
+  const stroke = compact ? 10 : 12;
+  const viewBox = compact ? 160 : 180;
+  const center = viewBox / 2;
+  const circumference = 2 * Math.PI * radius;
+  const targetOffset = circumference - (percent / 100) * circumference;
 
   return (
-    <div className="card flex flex-col items-center text-center">
-      <h3 className="mb-4 text-lg font-bold text-brand-900">Risk Assessment</h3>
-      <div className="relative h-36 w-36">
-        <svg className="h-full w-full -rotate-90" viewBox="0 0 120 120">
+    <div className="relative flex flex-col items-center">
+      <motion.div
+        className="absolute inset-0 rounded-full opacity-30 blur-xl"
+        style={{ backgroundColor: color }}
+        animate={{ scale: [1, 1.08, 1], opacity: [0.15, 0.25, 0.15] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg className="h-full w-full -rotate-90" viewBox={`0 0 ${viewBox} ${viewBox}`}>
           <circle
-            cx="60"
-            cy="60"
-            r="54"
+            cx={center}
+            cy={center}
+            r={radius}
             fill="none"
-            stroke="#e2e8f0"
-            strokeWidth="10"
+            stroke="#F1F5F9"
+            strokeWidth={stroke}
           />
-          <circle
-            cx="60"
-            cy="60"
-            r="54"
+          <motion.circle
+            cx={center}
+            cy={center}
+            r={radius}
             fill="none"
             stroke={color}
-            strokeWidth="10"
+            strokeWidth={stroke}
             strokeLinecap="round"
             strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            className="transition-all duration-700"
+            initial={{ strokeDashoffset: circumference }}
+            animate={{ strokeDashoffset: targetOffset }}
+            transition={{ duration: 1.4, ease: [0.4, 0, 0.2, 1], delay: 0.2 }}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-3xl font-bold" style={{ color }}>
-            {percent}%
-          </span>
-          <span className="text-xs uppercase tracking-wide text-slate-500">
-            CVD risk
-          </span>
+          <motion.span
+            className={`font-bold tracking-tight ${compact ? "text-2xl" : "text-4xl"}`}
+            style={{ color }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+          >
+            <AnimatedCounter value={percent} suffix="%" />
+          </motion.span>
+          {!compact && (
+            <span className="mt-0.5 text-overline text-slate-400">CVD Risk</span>
+          )}
         </div>
       </div>
-      <p
-        className="mt-4 rounded-full px-4 py-1 text-sm font-semibold capitalize"
-        style={{ backgroundColor: `${color}22`, color }}
-      >
-        {label} risk
-      </p>
-      <p className="mt-2 text-sm text-slate-500">
-        BMI: <strong>{bmi}</strong> · Model: {modelName}
-      </p>
     </div>
   );
 }

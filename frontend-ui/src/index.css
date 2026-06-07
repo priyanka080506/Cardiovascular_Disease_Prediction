@@ -2,31 +2,190 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: "DM Sans", system-ui, sans-serif;
-  @apply text-slate-800 antialiased;
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: "DM Sans", system-ui, sans-serif;
+    @apply bg-surface text-ink;
+  }
 }
 
-.card {
-  @apply rounded-2xl border border-slate-200 bg-white p-6 shadow-sm;
+@layer components {
+  /* Typography scale */
+  .text-display {
+    @apply text-3xl font-bold tracking-tight text-ink sm:text-4xl;
+  }
+
+  .text-heading {
+    @apply text-lg font-semibold tracking-tight text-ink sm:text-xl;
+  }
+
+  .text-subheading {
+    @apply text-base font-medium text-ink;
+  }
+
+  .text-body-lg {
+    @apply text-base leading-relaxed text-slate-600;
+  }
+
+  .text-body {
+    @apply text-sm leading-relaxed text-slate-600;
+  }
+
+  .text-caption {
+    @apply text-xs leading-normal text-slate-500;
+  }
+
+  .text-overline {
+    @apply text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400;
+  }
+
+  /* Surfaces */
+  .card {
+    @apply rounded-2xl border border-slate-200/70 bg-white p-5 shadow-card sm:p-6;
+  }
+
+  .card-elevated {
+    @apply card shadow-elevated;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300/80 hover:shadow-card-hover;
+  }
+
+  .card-glass {
+    @apply rounded-2xl border border-white/60 bg-white/75 p-5 shadow-xl backdrop-blur-xl;
+  }
+
+  .panel {
+    @apply rounded-2xl border border-slate-200/60 bg-white p-5 shadow-card sm:p-6;
+  }
+
+  .panel-muted {
+    @apply rounded-2xl border border-slate-200/50 bg-slate-50/90 p-5 shadow-sm backdrop-blur-sm sm:p-6;
+  }
+
+  .panel-glass {
+    @apply card-glass;
+  }
+
+  .accent-bar {
+    @apply h-0.5 w-12 rounded-full bg-accent-line;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primary-lg {
+    @apply btn-primary px-7 py-3.5 text-base;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-colors duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-ink;
+  }
+
+  /* Form */
+  .input-field {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-ink transition-colors placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100;
+  }
+
+  .input-field-error {
+    @apply input-field border-danger/40 focus:border-danger focus:ring-red-50;
+  }
+
+  .label-text {
+    @apply mb-1.5 block text-sm font-medium text-slate-700;
+  }
+
+  .error-text {
+    @apply mt-1.5 flex items-center gap-1.5 text-xs font-medium text-danger;
+  }
+
+  /* Badges — use sparingly */
+  .badge {
+    @apply inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold;
+  }
+
+  .badge-neutral {
+    @apply badge bg-slate-100 text-slate-600;
+  }
+
+  .badge-brand {
+    @apply badge bg-brand-100 text-brand-700;
+  }
+
+  .badge-success {
+    @apply badge bg-emerald-50 text-emerald-700;
+  }
+
+  .badge-warning {
+    @apply badge bg-amber-50 text-amber-700;
+  }
+
+  .badge-danger {
+    @apply badge bg-red-50 text-red-700;
+  }
+
+  /* Legacy aliases */
+  .badge-primary {
+    @apply badge-brand;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-600 to-secondary-600 bg-clip-text text-transparent;
+  }
+
+  .section-title {
+    @apply text-heading;
+  }
+
+  .section-divider {
+    @apply border-t border-slate-200/80 pt-8;
+  }
+
+  .stat-label {
+    @apply text-overline text-slate-400;
+  }
+
+  .skeleton {
+    @apply rounded-lg bg-gradient-to-r from-slate-200/60 via-slate-100 to-slate-200/60 bg-[length:200%_100%] animate-shimmer;
+  }
+
+  .input-field:focus,
+  .input-field:focus-visible {
+    @apply border-brand-500 shadow-glow-sm ring-2 ring-brand-100;
+  }
+
+  /* Custom range slider */
+  .range-input {
+    @apply h-1.5 w-full cursor-pointer appearance-none rounded-full bg-slate-200 outline-none;
+  }
+
+  .range-input::-webkit-slider-thumb {
+    @apply h-4 w-4 cursor-pointer appearance-none rounded-full border-2 border-white bg-brand-600 shadow-md;
+  }
+
+  .range-input::-moz-range-thumb {
+    @apply h-4 w-4 cursor-pointer rounded-full border-2 border-white bg-brand-600 shadow-md;
+  }
 }
 
-.btn-primary {
-  @apply rounded-xl bg-brand-600 px-6 py-3 font-semibold text-white shadow-md transition hover:bg-brand-700 disabled:opacity-50;
-}
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 
-.btn-secondary {
-  @apply rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700 transition hover:bg-slate-50;
-}
-
-.input-field {
-  @apply w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100;
-}
-
-.label-text {
-  @apply mb-1 block text-sm font-medium text-slate-600;
-}
-
-.error-text {
-  @apply mt-1 text-xs text-risk-high;
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
 }

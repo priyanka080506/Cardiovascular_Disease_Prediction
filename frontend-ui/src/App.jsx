@@ -1,10 +1,14 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import HealthRoadmap from "./components/HealthRoadmap";
-import RiskGauge from "./components/RiskGauge";
-import ShapChart from "./components/ShapChart";
-import SimulationSandbox from "./components/SimulationSandbox";
+import Footer from "./components/layout/Footer";
+import Header from "./components/layout/Header";
+import CardiovascularBackground from "./components/ui/CardiovascularBackground";
+import { DashboardSkeleton, FormSkeleton } from "./components/ui/Skeleton";
 import VitalsForm from "./components/VitalsForm";
+import { AlertIcon } from "./components/ui/Icons";
 import { predictHealth } from "./utils/api";
+import { pageTransition } from "./utils/motionVariants";
+import Dashboard from "./views/Dashboard";
 import Landing from "./views/Landing";
 
 export default function App() {
@@ -30,67 +34,68 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-brand-50 to-slate-50">
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <button
-            type="button"
-            className="text-lg font-bold text-brand-900"
-            onClick={() => setStep("landing")}
-          >
-            CVD<span className="text-brand-600">Insight</span>
-          </button>
-          {step !== "landing" && (
-            <button type="button" className="btn-secondary" onClick={() => setStep("form")}>
-              New Assessment
-            </button>
+    <div className="relative flex min-h-screen flex-col bg-surface">
+      <CardiovascularBackground />
+      <div className="pointer-events-none fixed inset-0 bg-hero-gradient" aria-hidden />
+
+      <Header
+        step={step}
+        onHome={() => { setStep("landing"); setError(""); }}
+        onNewAssessment={() => { setStep("form"); setError(""); }}
+      />
+
+      <main className="relative z-10 mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
+        <AnimatePresence mode="wait">
+          {step === "landing" && (
+            <motion.div key="landing" {...pageTransition}>
+              <Landing onStart={() => setStep("form")} />
+            </motion.div>
           )}
-        </div>
-      </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-8">
-        {step === "landing" && <Landing onStart={() => setStep("form")} />}
+          {step === "form" && (
+            <motion.div key="form" {...pageTransition} className="space-y-5">
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, height: 0 }}
+                    animate={{ opacity: 1, y: 0, height: "auto" }}
+                    exit={{ opacity: 0, y: -8, height: 0 }}
+                    className="overflow-hidden rounded-xl border border-red-200 bg-red-50/90 px-4 py-3 backdrop-blur-sm"
+                  >
+                    <div className="flex items-start gap-2.5">
+                      <AlertIcon className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+                      <div>
+                        <p className="text-sm font-medium text-red-800">{error}</p>
+                        <p className="mt-1 text-caption text-red-600">
+                          Start the API:{" "}
+                          <code className="rounded bg-red-100/80 px-1.5 py-0.5 font-mono">
+                            uvicorn app.main:app --reload
+                          </code>
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {loading ? <FormSkeleton /> : <VitalsForm onSubmit={handlePredict} loading={loading} />}
+            </motion.div>
+          )}
 
-        {step === "form" && (
-          <div className="space-y-4">
-            {error && (
-              <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                {error}
-                <p className="mt-1 text-xs">
-                  Ensure the API is running:{" "}
-                  <code className="rounded bg-red-100 px-1">uvicorn app.main:app --reload</code>
-                </p>
-              </div>
-            )}
-            <VitalsForm onSubmit={handlePredict} loading={loading} />
-          </div>
-        )}
+          {step === "dashboard" && loading && (
+            <motion.div key="loading" {...pageTransition}>
+              <DashboardSkeleton />
+            </motion.div>
+          )}
 
-        {step === "dashboard" && result && input && (
-          <div className="space-y-6">
-            <div className="grid gap-6 lg:grid-cols-3">
-              <RiskGauge
-                percent={result.risk_percent}
-                label={result.risk_label}
-                bmi={result.bmi}
-                modelName={result.model_name}
-              />
-              <div className="lg:col-span-2">
-                <ShapChart
-                  contributions={result.shap_contributions}
-                  topDrivers={result.top_risk_drivers}
-                />
-              </div>
-            </div>
-            <HealthRoadmap recommendations={result.recommendations} />
-            <SimulationSandbox baselineInput={input} baselineResult={result} />
-          </div>
-        )}
+          {step === "dashboard" && result && input && !loading && (
+            <motion.div key="dashboard" {...pageTransition}>
+              <Dashboard result={result} input={input} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
-      <footer className="border-t border-slate-200 py-6 text-center text-xs text-slate-400">
-        Educational decision support only — not a substitute for clinical diagnosis.
-      </footer>
+      <Footer />
     </div>
   );
 }
